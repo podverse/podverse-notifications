@@ -1,10 +1,12 @@
 import { firebaseNotificationBatchOrchestrator } from 'podverse-external-services';
 import { webpushNotificationBatchOrchestrator } from '../webpush';
 import { WebPushSubscription } from '../webpush';
+import { unifiedpushNotificationBatchOrchestrator } from '../unifiedpush';
+import { UPSubscription } from '../unifiedpush';
 import { i18nNotifications, NotificationMessageType } from './i18nNotifications';
 
 export type NotificationPlatform = 'web' | 'android' | 'ios';
-export type NotificationService = 'firebase' | 'webpush';
+export type NotificationService = 'firebase' | 'webpush' | 'unifiedpush';
 
 /**
  * Gets the URL path prefix for a given notification message type
@@ -58,9 +60,16 @@ type WebPushNotificationOrchestratorParams = BaseNotificationOrchestratorParams 
   subscriptions: WebPushSubscription[];
 };
 
+// UnifiedPush-specific params
+type UnifiedPushNotificationOrchestratorParams = BaseNotificationOrchestratorParams & {
+  service: 'unifiedpush';
+  subscriptions: UPSubscription[];
+};
+
 export type NotificationOrchestratorParams = 
   | FirebaseNotificationOrchestratorParams 
-  | WebPushNotificationOrchestratorParams;
+  | WebPushNotificationOrchestratorParams
+  | UnifiedPushNotificationOrchestratorParams;
 
 function getFinalText(messageText: string, messageType: NotificationMessageType, locale: string) {
   const baseLocale = locale.includes('-') ? locale.split('-')[0] : locale;
@@ -100,6 +109,17 @@ export async function notificationOrchestrator(params: NotificationOrchestratorP
     const webpushParams = params as WebPushNotificationOrchestratorParams;
     return await webpushNotificationBatchOrchestrator({
       subscriptions: webpushParams.subscriptions,
+      finalText,
+      link,
+      icon,
+      data,
+    });
+  }
+
+  case 'unifiedpush': {
+    const upParams = params as UnifiedPushNotificationOrchestratorParams;
+    return await unifiedpushNotificationBatchOrchestrator({
+      subscriptions: upParams.subscriptions,
       finalText,
       link,
       icon,
