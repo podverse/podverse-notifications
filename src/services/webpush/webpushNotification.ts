@@ -6,8 +6,7 @@ import { getWebBaseUrl, getWebBaseUrlWithPath, getWebIconImageUrl } from '../../
 type WebPushPayload = {
   title: string;
   body?: string;
-  icon?: string;
-  image?: string;
+  image?: string;  // Item/channel artwork for large preview
   link?: string;
   data?: Record<string, unknown>;
 };
@@ -34,8 +33,8 @@ export async function sendWebPushNotificationBatch(
     const notificationPayload = JSON.stringify({
       title: payload.title,
       body: payload.body || "",
-      icon: payload.icon || getWebIconImageUrl(),
-      image: payload.image,
+      icon: getWebIconImageUrl(),  // Always use app icon for branding
+      image: payload.image,  // Item/channel artwork
       link: payload.link ? getWebBaseUrlWithPath(payload.link) : getWebBaseUrl(),
       data: payload.data,
     });
@@ -55,6 +54,7 @@ export async function sendWebPushNotificationBatch(
             }
           );
           return { success: true, endpoint: subscription.endpoint };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
           console.error(`Web Push send failed for ${subscription.endpoint}:`, error.message);
           return { 

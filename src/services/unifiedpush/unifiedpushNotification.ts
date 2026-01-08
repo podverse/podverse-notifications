@@ -5,8 +5,7 @@ import { config, getWebBaseUrl, getWebBaseUrlWithPath, getWebIconImageUrl } from
 type UPPayload = {
   title: string;
   body?: string;
-  icon?: string;
-  image?: string;
+  image?: string;  // Item/channel artwork for X-Attach
   link?: string;
   data?: Record<string, unknown>;
 };
@@ -43,10 +42,10 @@ export async function sendUPNotificationBatch(
             'X-Title': payload.title,
             'X-Tags': config.brandName,
             'X-Click': payload.link ? getWebBaseUrlWithPath(payload.link) : getWebBaseUrl(),
-            'X-Icon': payload.icon || getWebIconImageUrl(),
+            'X-Icon': getWebIconImageUrl(),  // Always use app icon for branding
           };
 
-          // Add image as attachment for preview
+          // Add item/channel artwork as image attachment for preview
           if (payload.image) {
             headers['X-Attach'] = payload.image;
           }

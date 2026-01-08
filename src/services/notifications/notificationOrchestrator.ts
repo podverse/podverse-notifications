@@ -46,7 +46,8 @@ type BaseNotificationOrchestratorParams = {
   messageText: string;
   messageType: NotificationMessageType;
   locale: string;
-  icon?: string;
+  body?: string;  // Secondary text (e.g., channel title)
+  image?: string;  // Item/channel artwork for large preview
   linkIdText?: string;
   mediumId: number;  // For constructing medium-specific links (e.g., /podcast/livestream vs /music/livestream)
   data?: Record<string, unknown>;
@@ -87,7 +88,7 @@ function getFinalText(messageText: string, messageType: NotificationMessageType,
 }
 
 export async function notificationOrchestrator(params: NotificationOrchestratorParams) {
-  const { service, messageText, messageType, locale, linkIdText, mediumId, icon, data } = params;
+  const { service, messageText, messageType, locale, body, linkIdText, mediumId, image, data } = params;
   const finalText = getFinalText(messageText, messageType, locale);
 
   // Construct the link from messageType, mediumId, and linkIdText
@@ -104,8 +105,9 @@ export async function notificationOrchestrator(params: NotificationOrchestratorP
       tokens: firebaseParams.tokens,
       platform: firebaseParams.platform,
       finalText,
+      body,
       link,
-      icon,
+      image,
       channelId: firebaseParams.channelId,
       badge: firebaseParams.badge,
       sound: firebaseParams.sound,
@@ -118,8 +120,9 @@ export async function notificationOrchestrator(params: NotificationOrchestratorP
     return await webpushNotificationBatchOrchestrator({
       subscriptions: webpushParams.subscriptions,
       finalText,
+      body,
       link,
-      icon,
+      image,
       data,
     });
   }
@@ -129,8 +132,9 @@ export async function notificationOrchestrator(params: NotificationOrchestratorP
     return await unifiedpushNotificationBatchOrchestrator({
       subscriptions: upParams.subscriptions,
       finalText,
+      body,
       link,
-      icon,
+      image,
       data,
     });
   }
