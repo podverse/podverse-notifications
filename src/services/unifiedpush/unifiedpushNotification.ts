@@ -1,6 +1,6 @@
 import { chunkArray } from 'podverse-helpers';
 import { UPSubscription } from './unifiedpushHelpers';
-import { getWebBaseUrl, getWebBaseUrlWithPath, getWebIconImageUrl } from '../../config';
+import { config, getWebBaseUrl, getWebBaseUrlWithPath, getWebIconImageUrl } from '../../config';
 
 type UPPayload = {
   title: string;
@@ -41,6 +41,7 @@ export async function sendUPNotificationBatch(
           const headers: Record<string, string> = {
             'Content-Type': 'text/plain',
             'X-Title': payload.title,
+            'X-Tags': config.brandName,
             'X-Click': payload.link ? getWebBaseUrlWithPath(payload.link) : getWebBaseUrl(),
             'X-Icon': payload.icon || getWebIconImageUrl(),
           };
