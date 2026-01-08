@@ -1,3 +1,4 @@
+import { MediumEnum } from 'podverse-helpers';
 import { firebaseNotificationBatchOrchestrator } from 'podverse-external-services';
 import { webpushNotificationBatchOrchestrator } from '../webpush';
 import { WebPushSubscription } from '../webpush';
@@ -10,8 +11,10 @@ export type NotificationService = 'firebase' | 'webpush' | 'unifiedpush';
 
 /**
  * Gets the URL path prefix for a given notification message type
+ * @param messageType - The type of notification message
+ * @param mediumId - Medium ID for medium-specific paths (e.g., livestreams)
  */
-function getLinkPathFromMessageType(messageType: NotificationMessageType): string {
+function getLinkPathFromMessageType(messageType: NotificationMessageType, mediumId: number): string {
   switch (messageType) {
   case 'new-episode':
     return '/episode';
@@ -27,7 +30,11 @@ function getLinkPathFromMessageType(messageType: NotificationMessageType): strin
     return '/album';
   case 'livestream-started':
   case 'livestream-scheduled':
-    return '/livestream';
+    // Music livestreams use /music/livestream, all others use /podcast/livestream
+    if (mediumId === MediumEnum.Music) {
+      return '/music/livestream';
+    }
+    return '/podcast/livestream';
   case 'new':
   default:
     return '';
@@ -41,6 +48,7 @@ type BaseNotificationOrchestratorParams = {
   locale: string;
   icon?: string;
   linkIdText?: string;
+  mediumId: number;  // For constructing medium-specific links (e.g., /podcast/livestream vs /music/livestream)
   data?: Record<string, unknown>;
 };
 
@@ -79,13 +87,13 @@ function getFinalText(messageText: string, messageType: NotificationMessageType,
 }
 
 export async function notificationOrchestrator(params: NotificationOrchestratorParams) {
-  const { service, messageText, messageType, locale, linkIdText, icon, data } = params;
+  const { service, messageText, messageType, locale, linkIdText, mediumId, icon, data } = params;
   const finalText = getFinalText(messageText, messageType, locale);
 
-  // Construct the link from messageType and linkIdText
+  // Construct the link from messageType, mediumId, and linkIdText
   let link: string | undefined;
   if (linkIdText) {
-    const pathPrefix = getLinkPathFromMessageType(messageType);
+    const pathPrefix = getLinkPathFromMessageType(messageType, mediumId);
     link = pathPrefix ? `${pathPrefix}/${linkIdText}` : undefined;
   }
 
