@@ -1,4 +1,5 @@
 export const config = {
+  brandName: process.env.BRAND_NAME || "Podverse",
   web: {
     protocol: process.env.WEB_PROTOCOL || "http",
     host: process.env.WEB_DOMAIN || "localhost",
@@ -10,7 +11,7 @@ export const config = {
     vapid_private_key: process.env.WEBPUSH_VAPID_PRIVATE_KEY || "",
     vapid_subject: process.env.WEBPUSH_VAPID_SUBJECT || "mailto:contact@podverse.fm"
   }
-}
+};
 
 export function getWebBaseUrl(): string {
   return `${config.web.protocol}://${config.web.host}`;
