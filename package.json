@@ -1,6 +1,6 @@
 {
   "name": "podverse-notifications",
-  "version": "5.1.18-develop",
+  "version": "5.1.19",
   "description": "Push notification helper module for Podverse use cases",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
