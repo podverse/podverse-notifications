@@ -1,3 +1,4 @@
+import { NotificationsContext } from '../../factory';
 import { sendUPNotificationBatch } from './unifiedpushNotification';
 import { UPSubscription } from './unifiedpushHelpers';
 
@@ -10,7 +11,10 @@ type UPOrchestratorParams = {
   data?: Record<string, unknown>;
 };
 
-export async function unifiedpushNotificationBatchOrchestrator(params: UPOrchestratorParams) {
+export async function unifiedpushNotificationBatchOrchestrator(
+  ctx: NotificationsContext,
+  params: UPOrchestratorParams
+) {
   const { subscriptions, finalText, body, image, link, data } = params;
 
   const payload = {
@@ -23,5 +27,5 @@ export async function unifiedpushNotificationBatchOrchestrator(params: UPOrchest
 
   console.log(`[unifiedpushNotificationBatchOrchestrator] Sending to ${subscriptions.length} subscriptions`);
 
-  return await sendUPNotificationBatch(subscriptions, payload);
+  return await sendUPNotificationBatch(ctx, subscriptions, payload);
 }

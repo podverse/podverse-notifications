@@ -1,5 +1,6 @@
 import { MediumEnum } from 'podverse-helpers';
-import { firebaseNotificationBatchOrchestrator } from 'podverse-external-services';
+import { firebaseNotificationBatchOrchestrator, type FirebaseContext } from 'podverse-external-services';
+import { NotificationsContext } from '../../factory';
 import { webpushNotificationBatchOrchestrator } from '../webpush';
 import { WebPushSubscription } from '../webpush';
 import { unifiedpushNotificationBatchOrchestrator } from '../unifiedpush';
@@ -56,6 +57,7 @@ type BaseNotificationOrchestratorParams = {
 // Firebase-specific params
 type FirebaseNotificationOrchestratorParams = BaseNotificationOrchestratorParams & {
   service: 'firebase';
+  firebaseCtx: FirebaseContext;
   tokens: string[];
   platform: NotificationPlatform;
   channelId?: string;
@@ -87,7 +89,10 @@ function getFinalText(messageText: string, messageType: NotificationMessageType,
   return `${prefix}${messageText}`;
 }
 
-export async function notificationOrchestrator(params: NotificationOrchestratorParams) {
+export async function notificationOrchestrator(
+  ctx: NotificationsContext,
+  params: NotificationOrchestratorParams
+) {
   const { service, messageText, messageType, locale, body, linkIdText, mediumId, image, data } = params;
   const finalText = getFinalText(messageText, messageType, locale);
 
@@ -101,7 +106,7 @@ export async function notificationOrchestrator(params: NotificationOrchestratorP
   switch (service) {
   case 'firebase': {
     const firebaseParams = params as FirebaseNotificationOrchestratorParams;
-    return await firebaseNotificationBatchOrchestrator({
+    return await firebaseNotificationBatchOrchestrator(firebaseParams.firebaseCtx, {
       tokens: firebaseParams.tokens,
       platform: firebaseParams.platform,
       finalText,
@@ -117,7 +122,7 @@ export async function notificationOrchestrator(params: NotificationOrchestratorP
 
   case 'webpush': {
     const webpushParams = params as WebPushNotificationOrchestratorParams;
-    return await webpushNotificationBatchOrchestrator({
+    return await webpushNotificationBatchOrchestrator(ctx, {
       subscriptions: webpushParams.subscriptions,
       finalText,
       body,
@@ -129,7 +134,7 @@ export async function notificationOrchestrator(params: NotificationOrchestratorP
 
   case 'unifiedpush': {
     const upParams = params as UnifiedPushNotificationOrchestratorParams;
-    return await unifiedpushNotificationBatchOrchestrator({
+    return await unifiedpushNotificationBatchOrchestrator(ctx, {
       subscriptions: upParams.subscriptions,
       finalText,
       body,

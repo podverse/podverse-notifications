@@ -1,7 +1,7 @@
+import webpush from 'web-push';
 import { chunkArray } from 'podverse-helpers';
-import { webpushAdmin } from './webpushAdmin';
+import { NotificationsContext } from '../../factory';
 import { WebPushSubscription } from './webpushHelpers';
-import { getWebBaseUrl, getWebBaseUrlWithPath, getWebIconImageUrl } from '../../config';
 
 type WebPushPayload = {
   title: string;
@@ -18,14 +18,15 @@ type WebPushResult = {
 };
 
 export async function sendWebPushNotificationBatch(
+  ctx: NotificationsContext,
   subscriptions: WebPushSubscription[],
   payload: WebPushPayload
 ): Promise<WebPushResult[]> {
-  if (!webpushAdmin) {
+  if (!ctx.webpushAdmin) {
     throw new Error("Web Push Admin is not initialized");
   }
 
-  const webpush = webpushAdmin;
+  const webpushInstance = ctx.webpushAdmin as typeof webpush;
   const chunks = chunkArray(subscriptions, 100);
   const allResults: WebPushResult[] = [];
 
@@ -33,16 +34,16 @@ export async function sendWebPushNotificationBatch(
     const notificationPayload = JSON.stringify({
       title: payload.title,
       body: payload.body || "",
-      icon: getWebIconImageUrl(),  // Always use app icon for branding
+      icon: ctx.getWebIconImageUrl(),  // Always use app icon for branding
       image: payload.image,  // Item/channel artwork
-      link: payload.link ? getWebBaseUrlWithPath(payload.link) : getWebBaseUrl(),
+      link: payload.link ? ctx.getWebBaseUrlWithPath(payload.link) : ctx.getWebBaseUrl(),
       data: payload.data,
     });
 
     const chunkResults = await Promise.allSettled(
       chunk.map(async (subscription) => {
         try {
-          await webpush.sendNotification(
+          await webpushInstance.sendNotification(
             {
               endpoint: subscription.endpoint,
               keys: subscription.keys,

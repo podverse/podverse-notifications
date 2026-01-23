@@ -7,7 +7,7 @@ export type NotificationMessageType = 'new'
 export type NotificationLocaleMap = Record<NotificationMessageType, string>;
 
 export const i18nNotifications: Record<string, NotificationLocaleMap> = {
-  "en": {
+  "en-US": {
     "new": "",
     "new-episode": "",
     "new-podcast": "",

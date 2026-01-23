@@ -1,3 +1,4 @@
+import { NotificationsContext } from '../../factory';
 import { sendWebPushNotificationBatch } from './webpushNotification';
 import { WebPushSubscription } from './webpushHelpers';
 
@@ -10,7 +11,10 @@ type WebPushOrchestratorParams = {
   data?: Record<string, unknown>;
 };
 
-export async function webpushNotificationBatchOrchestrator(params: WebPushOrchestratorParams) {
+export async function webpushNotificationBatchOrchestrator(
+  ctx: NotificationsContext,
+  params: WebPushOrchestratorParams
+) {
   const { subscriptions, finalText, body, image, link, data } = params;
   
   const payload = {
@@ -23,5 +27,5 @@ export async function webpushNotificationBatchOrchestrator(params: WebPushOrches
 
   console.log(`[webpushNotificationBatchOrchestrator] Sending to ${subscriptions.length} subscriptions`);
   
-  return await sendWebPushNotificationBatch(subscriptions, payload);
+  return await sendWebPushNotificationBatch(ctx, subscriptions, payload);
 }

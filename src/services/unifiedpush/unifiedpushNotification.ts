@@ -1,6 +1,6 @@
 import { chunkArray } from 'podverse-helpers';
+import { NotificationsContext } from '../../factory';
 import { UPSubscription } from './unifiedpushHelpers';
-import { config, getWebBaseUrl, getWebBaseUrlWithPath, getWebIconImageUrl } from '../../config';
 
 type UPPayload = {
   title: string;
@@ -25,6 +25,7 @@ type UPResult = {
  * @see https://unifiedpush.org/spec/android/
  */
 export async function sendUPNotificationBatch(
+  ctx: NotificationsContext,
   subscriptions: UPSubscription[],
   payload: UPPayload
 ): Promise<UPResult[]> {
@@ -40,9 +41,9 @@ export async function sendUPNotificationBatch(
           const headers: Record<string, string> = {
             'Content-Type': 'text/plain',
             'X-Title': payload.title,
-            'X-Tags': config.brandName,
-            'X-Click': payload.link ? getWebBaseUrlWithPath(payload.link) : getWebBaseUrl(),
-            'X-Icon': getWebIconImageUrl(),  // Always use app icon for branding
+            'X-Tags': ctx.config.brandName,
+            'X-Click': payload.link ? ctx.getWebBaseUrlWithPath(payload.link) : ctx.getWebBaseUrl(),
+            'X-Icon': ctx.getWebIconImageUrl(),  // Always use app icon for branding
           };
 
           // Add item/channel artwork as image attachment for preview
