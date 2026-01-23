@@ -175,7 +175,7 @@ await notificationOrchestrator({
   ],
   messageText: 'New Episode: My Podcast',
   messageType: 'new-episode',
-  locale: 'en',
+  locale: 'en-US',
   linkIdText: 'episode-id-text'
 });
 
@@ -186,7 +186,7 @@ await notificationOrchestrator({
   platform: 'android', // or 'ios'
   messageText: 'New Episode: My Podcast',
   messageType: 'new-episode',
-  locale: 'en',
+  locale: 'en-US',
   linkIdText: 'episode-id-text'
 });
 ```
